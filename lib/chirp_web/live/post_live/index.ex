@@ -46,6 +46,10 @@ defmodule ChirpWeb.PostLive.Index do
     {:noreply, update(socket, :posts, fn posts -> [post | posts] end)}
   end
 
+  def handle_info({:post_updated, post}, socket) do
+    {:noreply, update(socket, :posts, fn posts -> [post | posts] end)}
+  end
+
   defp fetch_posts do
     Timeline.list_posts()
   end
