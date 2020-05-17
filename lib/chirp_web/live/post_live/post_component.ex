@@ -19,22 +19,35 @@ defmodule ChirpWeb.PostLive.PostComponent do
         </div>
         <nav class="level is-mobile">
           <div class="level-left">
-            <a class="level-item">
-              <span class="icon is-small"><i class="fa fa-thumbs-up"></i></span>
+            <a class="level-item" phx-click="repost" phx-target="<%= @myself %>">
+              <span class="icon is-small"><i class="fas fa-retweet"></i><%= @post.reposts_count %></span>
             </a>
-            <a class="level-item">
-              <span class="icon is-small"><i class="fas fa-retweet"></i></span>
-            </a>
-            <a class="level-item">
-              <span class="icon is-small"><i class="fas fa-heart"></i></span>
+            <a class="level-item" phx-click="like" phx-target="<%= @myself %>">
+              <span class="icon is-small"><i class="fas fa-heart"></i><%= @post.likes_count %></span>
             </a>
           </div>
         </nav>
       </div>
       <div class="media-right">
-        <button class="delete"></button>
+        <%= live_patch to: Routes.post_index_path(@socket, :edit, @post.id) do %>
+          <span>✏️</span>
+        <% end %>
+        <span>&nbsp;&nbsp;</span>
+        <%= link to: "#", phx_click: "delete", phx_value_id: @post.id, data: [confirm: "Are you sure?"] do %>
+          <span>❌</span>
+        <% end %>
       </div>
     </article>
     """
+  end
+
+  def handle_event("like", _, socket) do
+    Chirp.Timeline.inc_likes(socket.assigns.post)
+    {:noreply, socket}
+  end
+
+  def handle_event("repost", _, socket) do
+    Chirp.Timeline.inc_reposts(socket.assigns.post)
+    {:noreply, socket}
   end
 end
